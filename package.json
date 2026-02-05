@@ -1,0 +1,31 @@
+{
+  "name": "gitig",
+  "version": "1.0.0",
+  "description": "Generate .gitignore files instantly. Built-in templates, zero dependencies, works offline.",
+  "main": "dist/cli.js",
+  "bin": {
+    "gitig": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test test/**/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "gitignore",
+    "git",
+    "template",
+    "cli",
+    "generator"
+  ],
+  "author": "MUIN",
+  "license": "MIT",
+  "type": "commonjs",
+  "files": [
+    "dist/"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.13.7",
+    "typescript": "^5.7.3"
+  }
+}

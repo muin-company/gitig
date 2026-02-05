@@ -1,0 +1,17 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+
+# Test artifacts
+test/temp/
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.swp
