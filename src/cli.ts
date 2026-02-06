@@ -14,22 +14,25 @@ gitig - Generate .gitignore files instantly
 Usage:
   gitig init              Detect project type and create .gitignore
   gitig list              List all available templates
+  gitig list --popular    List only the most commonly used templates
   gitig show <template>   Show template contents
   gitig add <templates>   Add one or more templates (comma-separated)
 
 Options:
   --append                Append to existing .gitignore instead of overwriting
   --output <file>         Output to a different file (default: .gitignore)
+  --popular               Show only popular templates (use with list)
   -h, --help              Show this help message
   -v, --version           Show version
 
 Examples:
   gitig init
+  gitig list
+  gitig list --popular
   gitig add node,macos
   gitig add python --append
   gitig add node --output my-gitignore
   gitig show rust
-  gitig list
 `);
 }
 
@@ -49,6 +52,8 @@ function parseOptions(args: string[]): { options: any; args: string[] } {
       options.append = true;
     } else if (arg === '--output') {
       options.output = args[++i];
+    } else if (arg === '--popular') {
+      options.popularOnly = true;
     } else if (arg === '-h' || arg === '--help') {
       options.help = true;
     } else if (arg === '-v' || arg === '--version') {
@@ -82,7 +87,7 @@ function main(): void {
       break;
     
     case 'list':
-      listCommand();
+      listCommand(options);
       break;
     
     case 'show':

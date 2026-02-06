@@ -9,6 +9,7 @@
 ## Features
 
 ✨ **Smart Detection** - Automatically detects your project type  
+⭐ **Popular Templates** - Quick access to most commonly used templates  
 📦 **Built-in Templates** - 10+ templates included, no internet required  
 🚀 **Zero Dependencies** - Lightweight and fast  
 🔧 **Flexible** - Combine multiple templates, append to existing files  
@@ -46,26 +47,29 @@ gitig init
 ### List Available Templates
 
 ```bash
+# List all templates
 gitig list
+
+# Show only popular templates
+gitig list --popular
 ```
 
-Output:
+Output (with `--popular`):
 ```
-Available templates:
+⭐ Popular templates:
 
-  node         - Node.js
-  python       - Python
-  go           - Go
-  rust         - Rust
-  java         - Java
-  macos        - macOS
-  windows      - Windows
-  linux        - Linux
-  jetbrains    - JetBrains IDEs
-  vscode       - Visual Studio Code
+⭐ node         - Node.js
+⭐ python       - Python
+⭐ go           - Go
+⭐ rust         - Rust
+⭐ macos        - macOS
+⭐ jetbrains    - JetBrains IDEs
+⭐ vscode       - Visual Studio Code
 
-Total: 10 templates
+Total: 7 templates
 ```
+
+All templates include popularity indicators (⭐) in the regular list.
 
 ### Show Template Contents
 

@@ -13,6 +13,7 @@ export interface Template {
   name: string;
   description: string;
   content: string;
+  popular?: boolean;
 }
 
 export const templates: Record<string, Template> = {
@@ -20,21 +21,25 @@ export const templates: Record<string, Template> = {
     name: 'node',
     description: 'Node.js',
     content: node,
+    popular: true,
   },
   python: {
     name: 'python',
     description: 'Python',
     content: python,
+    popular: true,
   },
   go: {
     name: 'go',
     description: 'Go',
     content: go,
+    popular: true,
   },
   rust: {
     name: 'rust',
     description: 'Rust',
     content: rust,
+    popular: true,
   },
   java: {
     name: 'java',
@@ -45,6 +50,7 @@ export const templates: Record<string, Template> = {
     name: 'macos',
     description: 'macOS',
     content: macos,
+    popular: true,
   },
   windows: {
     name: 'windows',
@@ -60,11 +66,13 @@ export const templates: Record<string, Template> = {
     name: 'jetbrains',
     description: 'JetBrains IDEs',
     content: jetbrains,
+    popular: true,
   },
   vscode: {
     name: 'vscode',
     description: 'Visual Studio Code',
     content: vscode,
+    popular: true,
   },
 };
 
@@ -72,6 +80,12 @@ export function getTemplate(name: string): Template | undefined {
   return templates[name.toLowerCase()];
 }
 
-export function listTemplates(): Template[] {
-  return Object.values(templates);
+export function listTemplates(options?: { popularOnly?: boolean }): Template[] {
+  const allTemplates = Object.values(templates);
+  
+  if (options?.popularOnly) {
+    return allTemplates.filter(t => t.popular);
+  }
+  
+  return allTemplates;
 }
