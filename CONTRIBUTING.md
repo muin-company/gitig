@@ -1,99 +1,142 @@
 # Contributing to gitig
 
-Thank you for your interest in contributing! 🎉
+Thanks for your interest in contributing! 🎉
 
-## Ways to Contribute
+## Quick Start
 
-### 1. Add New Templates
-
-To add a new template:
-
-1. Create a new file in `src/templates/` (e.g., `ruby.ts`)
-2. Export the template content as default:
-   ```typescript
-   export default `# Ruby
-   *.gem
-   .bundle/
-   vendor/
-   `;
-   ```
-3. Add the template to `src/templates/index.ts`
-4. Update the README.md to document the new template
-5. Add test coverage if needed
-
-### 2. Improve Existing Templates
-
-Templates should be:
-- Comprehensive but not overly verbose
-- Based on official or widely-used gitignore patterns
-- Well-commented (especially for non-obvious patterns)
-
-### 3. Report Bugs
-
-If you find a bug, please open an issue with:
-- Description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Your environment (OS, Node.js version)
-
-### 4. Suggest Features
-
-Feature requests are welcome! Please:
-- Check existing issues first
-- Explain the use case
-- Consider if it fits the "zero dependencies" philosophy
+1. Fork this repo
+2. Create a branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Write tests if applicable
+5. Run tests: `npm test`
+6. Commit: `git commit -m 'feat: add amazing feature'`
+7. Push: `git push origin feature/amazing-feature`
+8. Open a Pull Request
 
 ## Development Setup
 
 ```bash
 # Clone your fork
 git clone https://github.com/YOUR_USERNAME/gitig.git
-cd gitig
 
 # Install dependencies
 npm install
 
-# Build
-npm run build
+# Run in development mode
+npm run dev
 
 # Run tests
 npm test
-
-# Link locally for testing
-npm link
 ```
-
-## Pull Request Process
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests (`npm test`)
-5. Build (`npm run build`)
-6. Commit with a clear message
-7. Push to your fork
-8. Open a Pull Request
 
 ## Code Style
 
-- Use TypeScript
-- Follow existing code style
-- Keep functions small and focused
-- Add comments for complex logic
-- Update tests for new features
+We use:
+- ESLint for linting
+- Prettier for formatting
+- Conventional Commits for commit messages
 
-## Template Guidelines
+### Commit Message Format
 
-When adding templates:
-- Use official gitignore sources when possible
-- Organize patterns logically with comments
-- Test that patterns work as expected
-- Keep it focused (don't include everything, just common cases)
+```
+type(scope): subject
+
+body (optional)
+
+footer (optional)
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Code style (formatting, semicolons, etc.)
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `perf`: Performance improvement
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+**Example:**
+```
+feat(cli): add --verbose flag for detailed output
+
+Adds a new --verbose flag that shows debug information.
+Useful for troubleshooting issues.
+
+Closes #42
+```
+
+## Testing
+
+Please add tests for new features. We aim for >80% coverage.
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+## Reporting Bugs
+
+Use GitHub Issues with the bug report template.
+
+**Before reporting:**
+1. Check existing issues
+2. Try the latest version
+3. Include reproduction steps
+
+## Feature Requests
+
+Use GitHub Issues with the feature request template.
+
+**Before requesting:**
+1. Check existing issues and discussions
+2. Explain the use case, not just the solution
+3. Be open to alternative approaches
+
+## Pull Request Guidelines
+
+**Before submitting:**
+- [ ] Tests pass locally
+- [ ] Code follows style guide (run `npm run lint`)
+- [ ] Commit messages follow convention
+- [ ] PR description explains what/why, not just how
+- [ ] Breaking changes are clearly marked
+
+**PR Checklist:**
+- [ ] Updated documentation if needed
+- [ ] Added tests for new functionality
+- [ ] Updated CHANGELOG.md (if applicable)
+- [ ] Linked related issues
 
 ## Questions?
 
-Feel free to open an issue for discussion!
+Open a discussion or reach out on [Twitter @muin_kr](https://twitter.com/muin_kr).
 
 ---
 
-Thank you for contributing! 🙌
+## Code of Conduct
+
+Be respectful, inclusive, and constructive.
+
+**Expected behavior:**
+- Use welcoming and inclusive language
+- Respect differing viewpoints and experiences
+- Accept constructive criticism gracefully
+- Focus on what's best for the community
+
+**Unacceptable behavior:**
+- Harassment, trolling, or discriminatory language
+- Publishing others' private information
+- Other conduct which could reasonably be considered inappropriate
+
+---
+
+Thank you for contributing! 🙏
+
+**Run by AI, for humans** - [MUIN Company](https://muin.company)
