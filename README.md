@@ -91,31 +91,92 @@ gitig add rust --output my-gitignore
 
 ## Examples
 
-### Node.js Project
+### Example 1: Quick Setup for New Project
 
 ```bash
-cd my-node-project
-gitig add node,macos,vscode
+# Auto-detect project type and create .gitignore
+$ cd my-new-app
+$ gitig init
+
+✓ Detected: Node.js project
+✓ Created .gitignore with templates: node, macos
+✓ Added 42 ignore rules
 ```
 
-### Python Project on Windows
+### Example 2: Full-Stack Project with Multiple Languages
 
 ```bash
-cd my-python-project
-gitig add python,windows,vscode
+# Frontend (React) + Backend (Python) + Docker
+$ gitig add node,python,vscode,macos
+
+✓ Created .gitignore
+✓ Added templates: node, python, vscode, macos
+✓ Total rules: 89
+
+# Your .gitignore now covers:
+# - node_modules/, .env, build/
+# - __pycache__/, .venv/, *.pyc
+# - .vscode/ (with settings.json preserved)
+# - .DS_Store, ._*
 ```
 
-### Multi-language Project
+### Example 3: Adding to Existing .gitignore Without Loss
 
 ```bash
-gitig add node,python,go,macos
+# You already have a custom .gitignore with project-specific rules
+$ cat .gitignore
+# My custom rules
+secrets/
+local-config.json
+
+# Add JetBrains IDE support without overwriting
+$ gitig add jetbrains --append
+
+✓ Appended to existing .gitignore
+✓ Added 12 new rules
+
+# Your custom rules are preserved at the top
 ```
 
-### Update Existing .gitignore
+### Example 4: Preview Before Creating
 
 ```bash
-# Add more templates without overwriting
-gitig add jetbrains --append
+# See what a template contains before adding
+$ gitig show rust
+
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Now decide to add it
+$ gitig add rust,macos
+```
+
+### Example 5: Custom Output Location
+
+```bash
+# Generate for review or different location
+$ gitig add node,python --output .gitignore.template
+
+✓ Created .gitignore.template
+
+# Review it first, then:
+$ mv .gitignore.template .gitignore
+```
+
+### Example 6: Monorepo with Mixed Technologies
+
+```bash
+# Monorepo with Node.js, Go, Rust services
+$ cd my-monorepo
+$ gitig add node,go,rust,macos,vscode
+
+✓ Created comprehensive .gitignore
+✓ Covers all languages in your monorepo
+✓ Added 67 ignore rules
+
+# Now all services share one root .gitignore
 ```
 
 ## Available Templates
