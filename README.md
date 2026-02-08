@@ -1281,6 +1281,666 @@ git check-ignore -v src/config/secrets.json
 - ✅ No copy-paste errors
 - ✅ Combine multiple templates easily
 
+## Performance Tips
+
+### 1. Use Local Templates (Built-in)
+
+**Slow:**
+```bash
+curl https://www.toptal.com/developers/gitignore/api/node > .gitignore
+# Network request, slow, requires internet
+```
+
+**Fast:**
+```bash
+gitig add node
+# Instant, works offline
+```
+
+**Impact:** 100x faster, no network dependency.
+
+---
+
+### 2. Combine Templates in One Command
+
+**Slow:**
+```bash
+gitig add node
+gitig add macos --append
+gitig add vscode --append
+# Multiple file writes
+```
+
+**Fast:**
+```bash
+gitig add node,macos,vscode
+# Single operation
+```
+
+**Impact:** 3x faster for multiple templates.
+
+---
+
+### 3. Auto-detect vs Manual Selection
+
+**Quick:**
+```bash
+gitig init
+# Automatically detects project type
+# One command, done
+```
+
+**Precise (when needed):**
+```bash
+gitig add node,python,macos,vscode
+# Explicit control for multi-language projects
+```
+
+**Use `init` for standard projects, `add` for complex setups.**
+
+---
+
+### 4. Cache Template Lookups
+
+For automation scripts that run frequently:
+
+```bash
+#!/bin/bash
+# Cache template list
+TEMPLATES=$(gitig list)
+
+# Use cached list for validation
+if echo "$TEMPLATES" | grep -q "node"; then
+  gitig add node
+fi
+```
+
+---
+
+### 5. Reuse .gitignore Across Projects
+
+**Template approach:**
+
+```bash
+# Create master template
+gitig add node,macos,vscode > ~/.gitignore-template
+
+# Reuse in new projects
+cp ~/.gitignore-template ~/new-project/.gitignore
+
+# Or symlink (use with caution)
+ln -s ~/.gitignore-template ~/new-project/.gitignore
+```
+
+---
+
+### 6. Batch Initialize Multiple Projects
+
+**Slow:**
+```bash
+cd project1 && gitig init && cd ..
+cd project2 && gitig init && cd ..
+cd project3 && gitig init && cd ..
+```
+
+**Fast:**
+```bash
+# Parallel initialization
+for dir in project*/; do
+  (cd "$dir" && gitig init) &
+done
+wait
+```
+
+---
+
+### 7. Use --output for Preview (No Disk Write)
+
+**When experimenting:**
+
+```bash
+# Preview without creating file
+gitig add node --output /dev/stdout
+
+# Or use show
+gitig show node
+```
+
+**Impact:** No I/O overhead when testing templates.
+
+---
+
+### 8. Optimize CI/CD .gitignore Checks
+
+**Inefficient:**
+```bash
+# Re-generate and compare every time
+gitig add node > .gitignore.new
+diff .gitignore .gitignore.new
+```
+
+**Efficient:**
+```bash
+# Only check if .gitignore is missing
+if [ ! -f .gitignore ]; then
+  gitig init
+fi
+```
+
+---
+
+### 9. Use Global .gitignore for Personal Preferences
+
+**Avoid repeating OS/IDE patterns in every project:**
+
+```bash
+# Set up global ignore
+git config --global core.excludesfile ~/.gitignore_global
+
+# Add personal preferences once
+gitig add macos,vscode,jetbrains > ~/.gitignore_global
+
+# Now projects only need language-specific ignores
+cd my-project
+gitig add node  # No need for macos,vscode every time
+```
+
+---
+
+### 10. Minimize Template Redundancy
+
+**Inefficient:**
+```bash
+# Many overlapping patterns
+gitig add node,javascript,npm,yarn,webpack
+# Lots of duplicates (node already covers npm, yarn, etc.)
+```
+
+**Efficient:**
+```bash
+# Use comprehensive template
+gitig add node
+# Covers Node.js ecosystem completely
+```
+
+**Tip:** Check template contents (`gitig show`) to avoid unnecessary overlaps.
+
+---
+
+## FAQ
+
+### Q1: What's the difference between `gitig init` and `gitig add`?
+
+**A:**
+
+**`gitig init`** - Auto-detect
+```bash
+gitig init
+# Detects project type from files (package.json, requirements.txt, etc.)
+# Creates .gitignore automatically
+# Good for: Standard projects, quick setup
+```
+
+**`gitig add`** - Manual selection
+```bash
+gitig add node,python,macos
+# Explicitly choose templates
+# Good for: Multi-language projects, custom setups
+```
+
+**When to use which:**
+- **init**: New projects, standard tech stack
+- **add**: Complex projects, specific requirements
+
+---
+
+### Q2: Can I customize the built-in templates?
+
+**A:** Templates are embedded in the tool for offline use. To customize:
+
+**Option 1: Append custom patterns**
+```bash
+gitig add node
+cat >> .gitignore << 'EOF'
+
+# Custom project-specific patterns
+data/sensitive/
+config/local/
+*.secret.json
+EOF
+```
+
+**Option 2: Fork and modify**
+```bash
+git clone https://github.com/muin-company/gitig.git
+cd gitig
+
+# Edit templates in src/templates/
+nano src/templates/node.txt
+
+# Build and use locally
+npm run build
+npm link
+```
+
+**Option 3: Use --output and merge**
+```bash
+gitig add node --output base.gitignore
+# Edit base.gitignore
+# Merge with your custom patterns
+cat base.gitignore custom.gitignore > .gitignore
+```
+
+---
+
+### Q3: Does gitig work in CI/CD pipelines?
+
+**A:** Yes! It's designed for automation:
+
+**GitHub Actions:**
+```yaml
+- name: Generate .gitignore
+  run: npx gitig init
+
+- name: Verify .gitignore exists
+  run: test -f .gitignore
+```
+
+**GitLab CI:**
+```yaml
+validate-gitignore:
+  script:
+    - npx gitig init
+    - git diff --exit-code .gitignore || echo ".gitignore needs update"
+```
+
+**Benefits in CI:**
+- `npx gitig` - no global install needed
+- Fast (built-in templates, no network)
+- Deterministic output
+
+---
+
+### Q4: How do I keep .gitignore up-to-date with latest best practices?
+
+**A:** 
+
+**Manual update:**
+```bash
+# Backup current
+cp .gitignore .gitignore.backup
+
+# Regenerate
+gitig add node,macos,vscode
+
+# Review differences
+diff .gitignore.backup .gitignore
+
+# Merge custom patterns
+cat .gitignore.backup | grep "^# Custom" -A 999 >> .gitignore
+```
+
+**Automated (Renovate/Dependabot-style):**
+```yaml
+# .github/workflows/update-gitignore.yml
+name: Update .gitignore
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Monthly
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Update gitig
+        run: npm update -g gitig
+      
+      - name: Regenerate .gitignore
+        run: |
+          cp .gitignore .gitignore.backup
+          gitig add node,macos,vscode
+          
+      - name: Create PR if changed
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: update .gitignore templates'
+          title: 'Update .gitignore with latest templates'
+```
+
+---
+
+### Q5: What if I need a template that's not included?
+
+**A:** Built-in templates cover most common cases. For others:
+
+**Option 1: Request it**
+```bash
+# Open an issue
+https://github.com/muin-company/gitig/issues/new?title=Template%20Request:%20Flutter
+```
+
+**Option 2: Use gitignore.io as fallback**
+```bash
+curl https://www.toptal.com/developers/gitignore/api/flutter >> .gitignore
+```
+
+**Option 3: Create custom template**
+```bash
+# Create custom template file
+cat > ~/.gitig/custom/flutter.txt << 'EOF'
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+EOF
+
+# Use it (if custom template support added)
+gitig add custom/flutter
+```
+
+**Most requested templates:**
+- Flutter/Dart
+- Swift/iOS
+- Kotlin/Android
+- C/C++
+- R
+- Scala
+
+---
+
+### Q6: Can I use gitig for .dockerignore files?
+
+**A:** Not directly, but easy to adapt:
+
+```bash
+# Generate .gitignore first
+gitig add node --output .gitignore
+
+# Convert to .dockerignore
+cp .gitignore .dockerignore
+
+# Add Docker-specific patterns
+cat >> .dockerignore << 'EOF'
+
+# Docker-specific
+Dockerfile
+docker-compose.yml
+.dockerignore
+.git/
+.github/
+README.md
+LICENSE
+*.md
+EOF
+```
+
+**Future feature:** `gitig add node --type dockerignore` planned.
+
+---
+
+### Q7: How do I handle .gitignore in a monorepo?
+
+**A:** Multiple strategies:
+
+**Strategy 1: Root .gitignore only**
+```bash
+# Root .gitignore covers everything
+gitig add node,python,go,macos,vscode > .gitignore
+
+# Pros: Simple, one file
+# Cons: Less granular control
+```
+
+**Strategy 2: Root + package-specific**
+```bash
+# Root (common patterns)
+gitig add macos,vscode,jetbrains > .gitignore
+echo "node_modules/" >> .gitignore
+
+# Package-specific (additional patterns)
+cd packages/api
+echo "logs/" > .gitignore
+echo "*.log" >> .gitignore
+```
+
+**Strategy 3: Fully distributed**
+```bash
+# Each package has complete .gitignore
+cd packages/api
+gitig add node,macos,vscode
+
+cd packages/frontend
+gitig add node,macos,vscode
+
+# Root .gitignore is minimal
+echo ".DS_Store" > .gitignore
+```
+
+**Recommendation:** Strategy 2 (root for OS/IDE, packages for specific needs).
+
+---
+
+### Q8: Does gitig remove files already tracked by git?
+
+**A:** No. gitig only creates/updates .gitignore. It doesn't modify git's index.
+
+**After adding to .gitignore, you must manually untrack:**
+
+```bash
+# Example: Added node_modules/ to .gitignore
+gitig add node
+
+# But node_modules/ already tracked? Remove it:
+git rm -r --cached node_modules/
+git commit -m "chore: untrack node_modules"
+```
+
+**Common pattern:**
+```bash
+# 1. Add to .gitignore
+gitig add node
+
+# 2. Remove all tracked files that should be ignored
+git rm -r --cached .
+git add .
+
+# 3. Commit
+git commit -m "chore: fix .gitignore - untrack ignored files"
+```
+
+---
+
+### Q9: Can I use gitig with SVN, Mercurial, or other VCS?
+
+**A:** gitig is git-specific (generates .gitignore), but:
+
+**For Mercurial (.hgignore):**
+```bash
+# Generate .gitignore
+gitig add node --output .hgignore
+
+# Convert glob patterns to regex (if needed)
+# Most patterns work as-is in .hgignore
+```
+
+**For SVN:**
+```bash
+# SVN doesn't use ignore files - uses properties
+# But you can generate a reference
+gitig add node --output svn-ignore.txt
+
+# Apply to SVN
+while read pattern; do
+  svn propset svn:ignore "$pattern" .
+done < svn-ignore.txt
+```
+
+**Recommendation:** Stick to git. gitig is optimized for .gitignore format.
+
+---
+
+### Q10: How does `--append` work with duplicate patterns?
+
+**A:**
+
+**Scenario:**
+```bash
+# Existing .gitignore
+node_modules/
+.env
+
+# Run with --append
+gitig add node --append
+
+# Result: May have duplicates
+node_modules/  ← Original
+.env           ← Original
+node_modules/  ← Added again
+dist/          ← New pattern
+build/         ← New pattern
+.env           ← Added again
+```
+
+**Solution: Deduplicate**
+```bash
+# Remove duplicates, preserve order
+awk '!seen[$0]++' .gitignore > .gitignore.tmp
+mv .gitignore.tmp .gitignore
+
+# Or sort and deduplicate
+sort -u .gitignore -o .gitignore
+```
+
+**Future improvement:** `--append` will auto-deduplicate.
+
+---
+
+### Q11: What's the recommended workflow for team projects?
+
+**A:** 
+
+**Setup (once):**
+```bash
+# Team lead generates .gitignore
+gitig add node,macos,windows,linux,vscode,jetbrains
+
+# Add project-specific patterns
+cat >> .gitignore << 'EOF'
+
+# Project-specific
+data/local/
+config/secrets/
+*.local.json
+EOF
+
+# Commit
+git add .gitignore
+git commit -m "chore: add .gitignore"
+git push
+```
+
+**Team members (after clone):**
+```bash
+git clone <repo>
+cd <repo>
+
+# .gitignore already there ✅
+# Start working immediately
+
+# If need to add personal patterns:
+# Use global .gitignore instead
+git config --global core.excludesfile ~/.gitignore_global
+gitig add jetbrains > ~/.gitignore_global  # If you use IntelliJ
+```
+
+**Maintenance:**
+```bash
+# Periodically update (after major changes)
+gitig add node,macos,windows,linux,vscode,jetbrains --append
+
+# Review and deduplicate
+sort -u .gitignore -o .gitignore
+
+# Commit updates
+git commit -m "chore: update .gitignore templates"
+```
+
+---
+
+### Q12: How do I debug why a file is being ignored?
+
+**A:** 
+
+**Check which .gitignore rule matches:**
+
+```bash
+# Git built-in command
+git check-ignore -v path/to/file
+
+# Output shows:
+.gitignore:12:*.log    path/to/file.log
+#          ^^  ^^^^^   ^^^^^^^^^^^^^^^
+#          |   |       File being checked
+#          |   Pattern that matched
+#          Line number in .gitignore
+```
+
+**Example:**
+```bash
+$ git check-ignore -v node_modules/package.json
+
+.gitignore:3:node_modules/    node_modules/package.json
+
+# This shows .gitignore line 3 is ignoring the file
+```
+
+**Fix if file should NOT be ignored:**
+```bash
+# Add exception in .gitignore
+node_modules/
+!node_modules/package.json  # Exception - don't ignore this
+```
+
+---
+
+## Roadmap
+
+### v1.1.0 (Next Release)
+- [ ] More built-in templates (Flutter, Swift, Kotlin, C++, R, Scala)
+- [ ] `--deduplicate` flag for automatic duplicate removal
+- [ ] `.dockerignore` generation support
+- [ ] Custom template directory support (`~/.gitig/templates/`)
+
+### v1.2.0
+- [ ] Interactive mode with template selection menu
+- [ ] `gitig update` command to refresh .gitignore with latest patterns
+- [ ] Template versioning (track which template version you used)
+- [ ] Diff mode: `gitig diff node` (show what's new in template)
+
+### v2.0.0
+- [ ] Cloud sync of custom templates
+- [ ] `.gitignore` linting (detect common mistakes)
+- [ ] Integration with GitHub's official gitignore repository
+- [ ] Auto-update notification when new template versions available
+- [ ] Web UI for template customization
+
+### Community Requests
+- [ ] Support for .hgignore, .svnignore conversion
+- [ ] Template composition (extend base templates)
+- [ ] Machine learning to suggest .gitignore improvements based on repo analysis
+- [ ] VS Code / JetBrains IDE extensions
+
+**Vote on features:** [GitHub Discussions](https://github.com/muin-company/gitig/discussions)
+
+**Contribute:** We welcome PRs for new templates and features!
+
+---
+
 ## Development
 
 ```bash
@@ -1297,18 +1957,151 @@ npm run build
 # Test
 npm test
 
-# Link locally
+# Test locally
 npm link
+gitig --version
+
+# Add new template
+# 1. Create template file: src/templates/flutter.txt
+# 2. Add to template index: src/templates/index.js
+# 3. Add tests: tests/flutter.test.js
+# 4. Update README
+
+# Run linting
+npm run lint
+
+# Run type checking (if TypeScript)
+npm run type-check
 ```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! We especially need:
+
+### Most Needed Contributions
+
+1. **New templates**
+   - Flutter/Dart
+   - Swift/iOS
+   - Kotlin/Android
+   - C/C++
+   - R programming
+   - Scala
+   - Elixir
+
+2. **Template improvements**
+   - Update existing templates with latest patterns
+   - Add comments explaining non-obvious patterns
+   - Test templates against real projects
+
+3. **Feature implementations**
+   - Custom template directory support
+   - Interactive mode
+   - `.dockerignore` generation
+   - Template diffing
+
+4. **Documentation**
+   - More real-world examples
+   - Video tutorials
+   - Translations (especially Chinese, Spanish, Portuguese)
+
+5. **Testing**
+   - Test coverage for edge cases
+   - Integration tests with real projects
+   - Performance benchmarks
+
+### How to Contribute
+
+1. **Fork the repository**
+   ```bash
+   gh repo fork muin-company/gitig
+   cd gitig
+   ```
+
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/add-flutter-template
+   ```
+
+3. **Make your changes**
+   - Add template to `src/templates/`
+   - Update `src/templates/index.js`
+   - Add tests to `tests/`
+   - Update README.md
+
+4. **Test your changes**
+   ```bash
+   npm test
+   npm run lint
+   
+   # Test manually
+   npm link
+   gitig show flutter
+   gitig add flutter
+   ```
+
+5. **Commit with conventional commits**
+   ```bash
+   git commit -m "feat: add Flutter/Dart template"
+   git commit -m "docs: add Flutter example to README"
+   git commit -m "fix: remove duplicate pattern in node template"
+   ```
+
+6. **Push and create PR**
+   ```bash
+   git push origin feature/add-flutter-template
+   gh pr create
+   ```
+
+### Contribution Guidelines
+
+- **Templates must be tested** on real projects
+- **Include comments** for non-obvious patterns
+- **No overly broad patterns** (e.g., `*` without good reason)
+- **Follow existing template structure** (categories, comments)
+- **Update README** with new template info
+- **Add tests** for new functionality
+
+### Template Submission Checklist
+
+- [ ] Template file created in `src/templates/`
+- [ ] Template added to `src/templates/index.js`
+- [ ] Tests added to `tests/`
+- [ ] README updated with template description
+- [ ] Example usage added to README
+- [ ] Tested on real project of that type
+- [ ] No overly broad patterns
+- [ ] Includes helpful comments
+
+---
 
 ## License
 
 MIT © MUIN
 
+## Related Projects
+
+- **gitignore.io** - Online .gitignore generator (requires internet)
+- **github/gitignore** - GitHub's official gitignore repository
+- **ignore** - Parser/checker for .gitignore files
+- **Ungit** - Visual git interface (includes .gitignore editor)
+
+## Support
+
+- 🐛 [Report bugs](https://github.com/muin-company/gitig/issues)
+- 💡 [Request features](https://github.com/muin-company/gitig/discussions)
+- 📧 Email: support@muin.company
+- 💬 [Community Discord](https://discord.gg/muin) (coming soon)
+- 📚 [Documentation](https://github.com/muin-company/gitig/wiki)
+
+## Stats
+
+- ⭐ Stars: [Check on GitHub](https://github.com/muin-company/gitig)
+- 📦 npm downloads: [![npm](https://img.shields.io/npm/dm/gitig.svg)](https://www.npmjs.com/package/gitig)
+- 🔧 Contributors: [See all contributors](https://github.com/muin-company/gitig/graphs/contributors)
+
 ---
 
 Made with ❤️ by [MUIN](https://github.com/muin-company)
+
+**Stop copying .gitignore files. Generate them.**
